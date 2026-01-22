@@ -25,11 +25,11 @@ u8 sMagicArrowCosts[] = {
     2, // ARROW_MAGIC_DEKU_BUBBLE
 };
 
-// Setting different Health Costs globally. LightCost is unused, until I figure out Light Arrow specific handling.
+// Setting different Health Costs globally.
 s32 healthCost = 16; // 1 heart
 s32 LensCost = 4; // Quarter Heart
 s32 GoraSetupCost = 8; // Half Heart
-s32 LightCost = 32; // Two Hearts
+s32 lightCost = 32; // Two Hearts
 
 s32 Player_UpperAction_7(Player* this, PlayState* play);
 
@@ -62,48 +62,48 @@ RECOMP_HOOK ("Magic_Update") s32 LifeMagicHook(PlayState* play, s16 magicToConsu
     s16 tempTimer;
 
     if ((gSaveContext.magicState == MAGIC_STATE_CONSUME_GORON_ZORA_SETUP) && (!CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI))) {
-    if (gSaveContext.save.saveInfo.playerData.magic <= 1) {
-    gSaveContext.save.saveInfo.playerData.magic =gSaveContext.save.saveInfo.playerData.magic + 2;
-    Health_ChangeBy(play, -GoraSetupCost);
-
-    }
-    gSaveContext.magicState = MAGIC_STATE_CONSUME_GORON_ZORA;
-
+        if (gSaveContext.save.saveInfo.playerData.magic <= 1) {
+            gSaveContext.save.saveInfo.playerData.magic =gSaveContext.save.saveInfo.playerData.magic + 2;
+            Health_ChangeBy(play, -GoraSetupCost);
+        }
+        gSaveContext.magicState = MAGIC_STATE_CONSUME_GORON_ZORA;
     }
 
     switch (gSaveContext.magicState) {
-    case MAGIC_STATE_CONSUME_LENS:
-    tempTimer = interfaceCtx->magicConsumptionTimer - 1;
-    if (tempTimer == 0) {
-        if ((!CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI) && (gSaveContext.save.saveInfo.playerData.magic == 1))) {
-            Health_ChangeBy(play, -LensCost);
-            gSaveContext.save.saveInfo.playerData.magic = 1;
-        }
-        interfaceCtx->magicConsumptionTimer = 80;
-    }
-    break;
-    case MAGIC_STATE_CONSUME_GORON_ZORA: // god fuck this specific case for being weird with a setup function that screws with everything >:(
-    tempTimer = interfaceCtx->magicConsumptionTimer - 1;
-    if (tempTimer <= 0) {
-        if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI) && (gSaveContext.save.saveInfo.playerData.magic == 1)) {
-            Health_ChangeBy(play, -LensCost);
-            gSaveContext.save.saveInfo.playerData.magic = 1;
-                } else {gSaveContext.save.saveInfo.playerData.magic--;
-                    }
-                interfaceCtx->magicConsumptionTimer = 10;
+        case MAGIC_STATE_CONSUME_LENS:
+            tempTimer = interfaceCtx->magicConsumptionTimer - 1;
+            if (tempTimer == 0) {
+                if ((!CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI) && (gSaveContext.save.saveInfo.playerData.magic == 1))) {
+                    Health_ChangeBy(play, -LensCost);
+                    gSaveContext.save.saveInfo.playerData.magic = 1;
+                }
+                interfaceCtx->magicConsumptionTimer = 80;
             }
-    break;
-    case MAGIC_STATE_CONSUME_GIANTS_MASK:
-    tempTimer = interfaceCtx->magicConsumptionTimer - 1;
-    if (tempTimer <= 0) {
-        if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI) && (gSaveContext.save.saveInfo.playerData.magic == 1)) {
-            Health_ChangeBy(play, -LensCost);
-            gSaveContext.save.saveInfo.playerData.magic = 1;
-                } else {gSaveContext.save.saveInfo.playerData.magic--;
+            break;
+        case MAGIC_STATE_CONSUME_GORON_ZORA: // god fuck this specific case for being weird with a setup function that screws with everything >:(
+            tempTimer = interfaceCtx->magicConsumptionTimer - 1;
+            if (tempTimer <= 0) {
+                if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI) && (gSaveContext.save.saveInfo.playerData.magic == 1)) {
+                    Health_ChangeBy(play, -LensCost);
+                    gSaveContext.save.saveInfo.playerData.magic = 1;
+                    } else {
+                        gSaveContext.save.saveInfo.playerData.magic--;
                     }
+                    interfaceCtx->magicConsumptionTimer = 10;
+                }
+            break;
+        case MAGIC_STATE_CONSUME_GIANTS_MASK:
+            tempTimer = interfaceCtx->magicConsumptionTimer - 1;
+            if (tempTimer <= 0) {
+                if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI) && (gSaveContext.save.saveInfo.playerData.magic == 1)) {
+                    Health_ChangeBy(play, -LensCost);
+                    gSaveContext.save.saveInfo.playerData.magic = 1;
+                } else {
+                    gSaveContext.save.saveInfo.playerData.magic--;
+                }
                 interfaceCtx->magicConsumptionTimer = R_MAGIC_CONSUME_TIMER_GIANTS_MASK;
             }
-    break;
+            break;
     }
 }
 
@@ -156,15 +156,12 @@ void BeforeArrowStuff(Player* this, PlayState* play) {
                     (ARROW_GET_MAGIC_FROM_TYPE(sArrowType) <= ARROW_MAGIC_LIGHT)) {
                     if ((gSaveContext.save.saveInfo.playerData.magic < magicCost)) {
                         ArrowCheck = true;
-                        // gSaveContext.save.saveInfo.playerData.health -= healthCost; // don't do this
-                        Health_ChangeBy(play, -healthCost);
+                        if (sArrowType == ARROW_TYPE_LIGHT) {
+                            Health_ChangeBy(play, -lightCost);
+                        } else {
+                            Health_ChangeBy(play, -healthCost);
+                        }
                     }
-
-                } else if ((sArrowType == ARROW_TYPE_DEKU_BUBBLE) &&
-                            (!CHECK_WEEKEVENTREG(WEEKEVENTREG_08_01) || (play->sceneId != SCENE_BOWLING))) {
-                    sMagicArrowType = ARROW_MAGIC_DEKU_BUBBLE;
-                } else {
-                    sMagicArrowType = ARROW_MAGIC_INVALID;
                 }
             }
         }

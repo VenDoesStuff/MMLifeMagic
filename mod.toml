@@ -18,8 +18,9 @@ description =  """
 Use Magic to your hearts content! Or.. Until you're out of hearts, at least.
 
 Makes most magic consuming actions in the game start consuming health when magic is empty.
-THIS CAN KILL YOU. 
-Affects all sources of Magic Consumption except for Fierce Deity beams."""
+THIS CAN KILL YOU.
+
+Affects all sources of Magic Consumption except for Fierce Deity beams and Deku Bubbles."""
 
 # A short description that will show up in this mod's entry in the mod list. This should be human readable and kept short
 # to prevent it from being cut off due to the limited space.
@@ -60,7 +61,7 @@ native_libraries = [
 elf_path = "build/mod.elf"
 
 # Output mod filename.
-mod_filename = "BloodMagic"
+mod_filename = "mm_recomp_blood_magic"
 
 # Reference symbol files.
 func_reference_syms_file = "Zelda64RecompSyms/mm.us.rev1.syms.toml"
