@@ -13,23 +13,14 @@ void Magic_Add(PlayState* play, s16 magicToAdd);
 s32 func_808305BC(PlayState* play, Player* this, ItemId* item, ArrowType* typeParam);
 void Player_SetUpperAction(PlayState* play, Player* this, PlayerUpperActionFunc upperActionFunc);
 
-u16 D_8085CFB0[] = {
-    NA_SE_PL_BOW_DRAW,
-    NA_SE_NONE,
-    NA_SE_IT_HOOKSHOT_READY,
-};
-u8 sMagicArrowCosts[] = {
-    4, // ARROW_MAGIC_FIRE
-    4, // ARROW_MAGIC_ICE
-    8, // ARROW_MAGIC_LIGHT
-    2, // ARROW_MAGIC_DEKU_BUBBLE
-};
+extern u16 D_8085CFB0[];
+extern u8 sMagicArrowCosts[];
 
 // Setting different Health Costs globally.
 s32 healthCost = 16; // 1 heart
 s32 LensCost = 4; // Quarter Heart
 s32 GoraSetupCost = 8; // Half Heart
-s32 lightCost = 32; // Two Hearts
+s32 lightCost = 32; // 2 Hearts
 
 s32 Player_UpperAction_7(Player* this, PlayState* play);
 
@@ -137,7 +128,7 @@ void BeforeArrowStuff(Player* this, PlayState* play) {
     gPlay = play;
     ArrowCheck = false;
 
-    // Follow the flow of the original function until we get to our desired point
+    // Follow the original function until desired point
     if ((this->heldItemAction >= PLAYER_IA_BOW_FIRE) && (this->heldItemAction <= PLAYER_IA_BOW_LIGHT) &&
         (gSaveContext.magicState != MAGIC_STATE_IDLE)) {
         return;
